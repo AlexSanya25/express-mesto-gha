@@ -11,4 +11,4 @@
 
 ### GitHub Pages
 
-[https://alexsanya25.github.io/mesto/](https://alexsanya25.github.io/mesto/)
+[https://alexsanya25.github.io/express-mesto-gha/](https://alexsanya25.github.io/express-mesto-gha/)
