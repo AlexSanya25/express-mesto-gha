@@ -1,16 +1,14 @@
-[![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+# Проект: Место
+
+### Описание проекта
+
+Проект создан с целью научиться основам бэкэнда.
 
 
-## Директории
+### Технологии, используемые при создании проекта
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
+В проекте используется технология express, благодаря которой мы смогли подключить сайт к серверу.
 
-## Запуск проекта
+### GitHub Pages
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+[https://alexsanya25.github.io/mesto/](https://alexsanya25.github.io/mesto/)

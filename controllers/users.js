@@ -5,7 +5,16 @@ const getUsers = async (req, res) => {
     const users = await User.find({});
     return res.send(users);
   } catch (error) {
-    return res.status(500).send({message: "Ошибка на стороне сервера", error: error.message});
+    switch (error.name) {
+      case 'CastError':
+       return res.status(400).send({message: "Передан не валидный ID"});
+
+      case 'ValidationError':
+        return res.status(error.statusCode).send(error.message);
+
+       default :
+         return res.status(500).send({message: "Ошибка на стороне сервера", error: error.message});
+     }
   }
 };
 
@@ -39,6 +48,8 @@ const createUser = async (req, res) => {
     switch (error.name) {
       case 'CastError':
        return res.status(400).send({message: "Передан не валидный ID"});
+      case 'ValidationError':
+       return res.status(error.statusCode).send(error.message);
 
        default :
          return res.status(500).send({message: "Ошибка на стороне сервера", error: error.message});
@@ -46,8 +57,56 @@ const createUser = async (req, res) => {
   }
 };
 
+
+const upUser = async (req, res) => {
+  try  {
+    const {name, about} = req.body;
+    const upUserProfile = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true },
+    );
+    return res.status(201).send(upUserProfile);
+  } catch (error) {
+    switch (error.name) {
+      case 'CastError':
+       return res.status(400).send({message: "Передан не валидный ID"});
+      case 'ValidationError':
+       return res.status(error.statusCode).send(error.message);
+
+       default :
+         return res.status(500).send({message: "Ошибка на стороне сервера", error: error.message});
+     }
+  }
+};
+
+const upUserAvatar = async (req, res) => {
+  try  {
+    const {avatar} = req.body;
+    const upUserAvatr = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true },
+    );
+    return res.status(201).send(upUserAvatr);
+  } catch (error) {
+    switch (error.name) {
+      case 'CastError':
+       return res.status(400).send({message: "Передан не валидный ID"});
+      case 'ValidationError':
+       return res.status(error.statusCode).send(error.message);
+
+       default :
+         return res.status(500).send({message: "Ошибка на стороне сервера", error: error.message});
+     }
+  }
+}
+
+
 module.exports = {
   getUsers,
   getUserById,
-  createUser
+  createUser,
+  upUser,
+  upUserAvatar
 }
