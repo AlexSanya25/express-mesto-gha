@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "lint": "npx eslint ."
   },
   "keywords": [],
   "author": "Alexandr Gavrik",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.55.0",
-    "eslint-plugin-react": "^7.33.2",
     "nodemon": "^3.0.2"
   },
   "dependencies": {
