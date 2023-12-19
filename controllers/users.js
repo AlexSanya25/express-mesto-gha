@@ -26,6 +26,8 @@ const getUserById = async (req, res) => {
     switch (error.name) {
       case 'CastError':
         return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
+      case 'MestoProjectError':
+        return res.status(error.statusCode).send(error.message);
 
       default:
         return res
@@ -41,8 +43,8 @@ const createUser = async (req, res) => {
     return res.status(HttpCodesCards.create).send(newUser);
   } catch (error) {
     switch (error.name) {
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
+      case 'CastError':
+        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
 
       default:
         return res
@@ -63,6 +65,8 @@ const upUser = async (req, res) => {
     return res.status(HttpCodesCards.create).send(upUserProfile);
   } catch (error) {
     switch (error.name) {
+      case 'CastError':
+        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
       case 'MestoProjectError':
         return res.status(error.statusCode).send(error.message);
 
@@ -85,6 +89,8 @@ const upUserAvatar = async (req, res) => {
     return res.status(HttpCodesCards.create).send(upUserAvatr);
   } catch (error) {
     switch (error.name) {
+      case 'CastError':
+        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
       case 'MestoProjectError':
         return res.status(error.statusCode).send(error.message);
 

@@ -3,6 +3,7 @@ const HttpCodesCards = {
   create: 201,
   notFound: 500,
   notFoundId: 400,
+  notFoundErr: 404,
 };
 
 module.exports = HttpCodesCards;

@@ -26,6 +26,8 @@ const deleteCard = async (req, res) => {
     switch (error.name) {
       case 'CastError':
         return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
+      case 'MestoProjectError':
+        return res.status(error.statusCode).send(error.message);
 
       default:
         return res
@@ -43,8 +45,8 @@ const createCard = async (req, res) => {
     return res.status(HttpCodesCards.create).send(newCard);
   } catch (error) {
     switch (error.name) {
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
+      case 'CastError':
+        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
 
       default:
         return res
