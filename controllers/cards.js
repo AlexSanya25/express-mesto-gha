@@ -19,7 +19,7 @@ const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findById(cardId).orFail(
-      () => new MestoProjectError('Пользователь по заданному ID не найден'),
+      () => new MestoProjectError('Карточка по заданному ID не найдена'),
     );
     return res.status(HttpCodesCards.success).send(card);
   } catch (error) {
@@ -45,8 +45,8 @@ const createCard = async (req, res) => {
     return res.status(HttpCodesCards.create).send(newCard);
   } catch (error) {
     switch (error.name) {
-      case 'CastError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
+      case 'ValidationError':
+        return res.status(HttpCodesCards.notFoundId).send({ message: 'Переданы не валидные данные' });
 
       default:
         return res
