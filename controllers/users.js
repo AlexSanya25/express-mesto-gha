@@ -11,7 +11,7 @@ async function getUsers(req, res) {
     const users = await User.find({});
     return res.send(users);
   } catch (error) {
-    return res.status(HttpCodesCards.notFound).send({ message: 'Ошибка на стороне сервера', error: error.message });
+    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
   }
 }
 
@@ -31,7 +31,7 @@ const getUserById = async (req, res) => {
 
       default:
         return res
-          .status(HttpCodesCards.notFound)
+          .status(HttpCodesCards.serverErr)
           .send({ message: 'Ошибка на стороне сервера', error: error.message });
     }
   }
@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
 
       default:
         return res
-          .status(HttpCodesCards.notFound)
+          .status(HttpCodesCards.serverErr)
           .send({ message: 'Ошибка на стороне сервера', error: error.message });
     }
   }
@@ -72,7 +72,7 @@ const upUser = async (req, res) => {
 
       default:
         return res
-          .status(HttpCodesCards.notFound)
+          .status(HttpCodesCards.serverErr)
           .send({ message: 'Ошибка на стороне сервера', error: error.message });
     }
   }
@@ -96,7 +96,7 @@ const upUserAvatar = async (req, res) => {
 
       default:
         return res
-          .status(HttpCodesCards.notFound)
+          .status(HttpCodesCards.serverErr)
           .send({ message: 'Ошибка на стороне сервера', error: error.message });
     }
   }
