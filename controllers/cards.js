@@ -18,9 +18,13 @@ async function getCards(req, res) {
 const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId).orFail(
+    const card = await Card.findById(cardId).populate('owner').orFail(
       () => new MestoProjectError('Карточка по заданному ID не найдена'),
     );
+    if (card.owner._id.toString() !== req.user._id.toString()) {
+      throw new MestoProjectError('У вас нет прав на удаление данной карточки');
+    }
+    await card.remove();
     return res.status(HttpCodesCards.success).send(card);
   } catch (error) {
     switch (error.name) {

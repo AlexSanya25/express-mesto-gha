@@ -4,6 +4,9 @@ const HttpCodesCards = {
   serverErr: 500,
   notFoundId: 400,
   notFoundErr: 404,
+  dublicate: 11000,
+  conflict: 409,
+  mismatchErr: 401,
 };
 
 module.exports = HttpCodesCards;

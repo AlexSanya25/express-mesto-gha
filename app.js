@@ -13,13 +13,15 @@ const app = express();
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(json());
+/*
 app.use((req, res, next) => {
   req.user = {
-    _id: '657ec3ef46c8d88d9103fa5d', // вставьте сюда _id созданного в предыдущем пункте пользователя
+    // eslint-disable-next-line max-len
+    _id: '657ec3ef46c8d88d9103fa5d',
   };
   next();
 });
-
+*/
 app.use(router);
 
 app.use((req, res, next) => {
