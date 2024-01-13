@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "celebrate": "^15.0.3",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.0",
     "express": "^4.18.2",
+    "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
     "npm-package-json-lint": "^7.1.0",

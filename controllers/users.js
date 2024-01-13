@@ -49,7 +49,10 @@ const createUser = async (req, res) => {
     const soltRounds = 10;
     const hash = await bcrypt.hash(password, soltRounds);
     const newUser = await User.create({ email, password: hash });
-    return res.status(HttpCodesCards.create).send(newUser);
+    return res.status(HttpCodesCards.create).send({
+      // eslint-disable-next-line max-len
+      name: newUser.name, about: newUser.about, avatar: newUser.avatar, email: newUser.email, id: newUser._id,
+    });
   } catch (error) {
     if (error.code === HttpCodesCards.dublicate) {
       return res.status(HttpCodesCards.conflict).send({ message: 'Такой пользователь уже существует' });

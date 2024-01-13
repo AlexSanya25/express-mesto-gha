@@ -1,10 +1,17 @@
 const { json } = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { errors } = require('celebrate');
 const router = require('./routes');
-
 // eslint-disable-next-line import/extensions
 const HttpCodesCards = require('./utils/constants.js');
+
+// eslint-disable-next-line import/extensions
+const NotFoundError = require('./utils/NotFoundError.js');
+
+// eslint-disable-next-line import/extensions
+const error = require('./utils/error.js')
 
 const { PORT = 3000 } = process.env;
 
@@ -24,12 +31,13 @@ app.use((req, res, next) => {
 */
 app.use(router);
 
-app.use((req, res, next) => {
-  res.status(HttpCodesCards.notFoundErr).send({ message: 'Такого маршрута не существует' });
-
-  next();
+app.use('*', (err) => {
+  throw new NotFoundError({ message: err.message });
 });
 
+// eslint-disable-next-line no-undef
+app.use(error);
+app.use(errors());
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
