@@ -3,19 +3,23 @@ const Card = require('../models/card.js');
 
 // eslint-disable-next-line import/extensions
 const MestoProjectError = require('../utils/MestoProjectError.js');
+// eslint-disable-next-line import/no-unresolved, import/extensions
+const NotValidIdError = require('../utils/NotValidIdError.js');
 
 // eslint-disable-next-line import/extensions
 const HttpCodesCards = require('../utils/constants.js');
 
-async function getCards(req, res) {
+// eslint-disable-next-line consistent-return
+async function getCards(req, res, next) {
   try {
     const cards = await Card.find({});
     return res.send(cards);
   } catch (error) {
-    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
+    next(error);
   }
 }
-const deleteCard = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findById(cardId).populate('owner').orFail(
@@ -24,43 +28,36 @@ const deleteCard = async (req, res) => {
     if (card.owner._id.toString() !== req.user._id.toString()) {
       throw new MestoProjectError('У вас нет прав на удаление данной карточки');
     }
-    await card.remove();
     return res.status(HttpCodesCards.success).send(card);
   } catch (error) {
-    switch (error.name) {
-      case 'CastError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'MestoProjectError') {
+      // eslint-disable-next-line no-undef
+      next(new MestoProjectError('Карточка по заданному ID не найдена'));
     }
+    if (error.name === 'CastError') {
+      next(new NotValidIdError('Передан не валидный ID'));
+    }
+    next(error);
   }
 };
 
-const createCard = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
     const newCard = await Card.create({ name, link, owner });
     return res.status(HttpCodesCards.create).send(newCard);
   } catch (error) {
-    switch (error.name) {
-      case 'ValidationError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Переданы не валидные данные' });
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'ValidationError') {
+      next(new NotValidIdError('Переданы не валидные данные'));
     }
+    next(error);
   }
 };
 
-const likeCard = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const likeCard = async (req, res, next) => {
   try {
     const like = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -71,21 +68,19 @@ const likeCard = async (req, res) => {
     );
     return res.status(HttpCodesCards.create).send(like);
   } catch (error) {
-    switch (error.name) {
-      case 'CastError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'MestoProjectError') {
+      // eslint-disable-next-line no-undef
+      next(new MestoProjectError('Карточка по заданному ID не найдена'));
     }
+    if (error.name === 'CastError') {
+      next(new NotValidIdError('Передан не валидный ID'));
+    }
+    next(error);
   }
 };
 
-const disLikeCard = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const disLikeCard = async (req, res, next) => {
   try {
     const like = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -96,17 +91,14 @@ const disLikeCard = async (req, res) => {
     );
     return res.status(HttpCodesCards.create).send(like);
   } catch (error) {
-    switch (error.name) {
-      case 'CastError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'MestoProjectError') {
+      // eslint-disable-next-line no-undef
+      next(new MestoProjectError('Карточка по заданному ID не найдена'));
     }
+    if (error.name === 'CastError') {
+      next(new NotValidIdError('Передан не валидный ID'));
+    }
+    next(error);
   }
 };
 

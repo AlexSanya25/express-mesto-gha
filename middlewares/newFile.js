@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-
-// eslint-disable-next-line import/extensions
 const NotAuthorizate = require('../utils/NotAuthorizate.js');
 
 // eslint-disable-next-line func-names, consistent-return
@@ -14,7 +12,7 @@ module.exports = function (req, res, next) {
     const validToken = token.replace('Bearer ', '');
     // eslint-disable-next-line no-unused-vars
     payload = jwt.verify(validToken, 'dev_secret');
-  } catch (error) {
+  } catch () {
     next(new NotAuthorizate('С токеном что-то не так'));
   }
   req.user = payload;

@@ -5,22 +5,30 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user.js');
 
 const MestoProjectError = require('../utils/MestoProjectError.js');
+// eslint-disable-next-line import/no-unresolved
+const NotValidIdError = require('../utils/NotValidIdError.js');
+const ConflictError = require('../utils/ConflictError.js');
+// eslint-disable-next-line import/extensions
+const NotAuthorizate = require('../utils/NotAuthorizate.js');
 
 // eslint-disable-next-line import/extensions
 const HttpCodesCards = require('../utils/constants.js');
 
 const generateToken = require('../utils/jwt.js');
 
-async function getUsers(req, res) {
+// eslint-disable-next-line consistent-return
+async function getUsers(req, res, next) {
   try {
     const users = await User.find({});
     return res.send(users);
-  } catch (error) {
-    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
+  } catch (err) {
+    // eslint-disable-next-line no-undef
+    next(err);
   }
 }
 
-const getUserById = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const getUserById = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId).orFail(
@@ -28,21 +36,19 @@ const getUserById = async (req, res) => {
     );
     return res.status(HttpCodesCards.success).send(user);
   } catch (error) {
-    switch (error.name) {
-      case 'CastError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send({ message: error.message });
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'MestoProjectError') {
+      // eslint-disable-next-line no-undef
+      next(new MestoProjectError('Пользователь по заданному ID не найден'));
     }
+    if (error.name === 'CastError') {
+      next(new NotValidIdError('Передан не валидный ID'));
+    }
+    next(error);
   }
 };
 
-const createUser = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const createUser = async (req, res, next) => {
   try {
     const { email } = req.body;
     const password = req.body.toString();
@@ -55,13 +61,15 @@ const createUser = async (req, res) => {
     });
   } catch (error) {
     if (error.code === HttpCodesCards.dublicate) {
-      return res.status(HttpCodesCards.conflict).send({ message: 'Такой пользователь уже существует' });
+      // eslint-disable-next-line no-undef
+      next(new ConflictError('Такой пользователь уже существует'));
     }
-    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
+    next(error);
   }
 };
 
-const upUser = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const upUser = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const upUserProfile = await User.findByIdAndUpdate(
@@ -71,21 +79,18 @@ const upUser = async (req, res) => {
     );
     return res.status(HttpCodesCards.create).send(upUserProfile);
   } catch (error) {
-    switch (error.name) {
-      case 'ValidationError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Переданы не валидные данные' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'ValidationError') {
+      next(new NotValidIdError('Переданы не валидные данные'));
     }
+    if (error.name === 'MestoProjectError') {
+      next(new MestoProjectError('Пользователь по заданному ID не найден'));
+    }
+    next(error);
   }
 };
 
-const upUserAvatar = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const upUserAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
     const upUserAvatr = await User.findByIdAndUpdate(
@@ -95,22 +100,18 @@ const upUserAvatar = async (req, res) => {
     );
     return res.status(HttpCodesCards.create).send(upUserAvatr);
   } catch (error) {
-    switch (error.name) {
-      case 'ValidationError':
-        return res.status(HttpCodesCards.notFoundId).send({ message: 'Переданы не валидные данные' });
-      case 'MestoProjectError':
-        return res.status(error.statusCode).send(error.message);
-
-      default:
-        return res
-          .status(HttpCodesCards.serverErr)
-          .send({ message: 'Ошибка на стороне сервера', error: error.message });
+    if (error.name === 'ValidationError') {
+      next(new NotValidIdError('Переданы не валидные данные'));
     }
+    if (error.name === 'MestoProjectError') {
+      next(new MestoProjectError('Пользователь по заданному ID не найден'));
+    }
+    next(error);
   }
 };
 
 // eslint-disable-next-line consistent-return
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { email } = req.body;
   const password = req.body.toString();
   try {
@@ -126,24 +127,25 @@ const login = async (req, res) => {
     return res.status(HttpCodesCards.success).send({ userAdmin, token });
   } catch (error) {
     if (error.message === 'NotAuthantificate') {
-      return res.status(HttpCodesCards.mismatchErr).send({ message: 'Неверный адрес или пароль' });
+      next(new NotAuthorizate('Неверно введены данные'));
     }
-    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
+    next(error);
   }
 };
 
-const getUsersMe = async (req, res) => {
+// eslint-disable-next-line consistent-return
+const getUsersMe = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.body._id });
     if (!user) {
-      throw new Error('User not found');
+      throw new NotValidIdError('User not found');
     }
     return res.status(HttpCodesCards.success).send(user);
   } catch (error) {
     if (error.message === 'User not found') {
-      return res.status(HttpCodesCards.notFoundId).send({ message: 'Передан не валидный ID' });
+      next(new NotValidIdError('Переданы не валидные данные'));
     }
-    return res.status(HttpCodesCards.serverErr).send({ message: 'Ошибка на стороне сервера', error: error.message });
+    next(error);
   }
 };
 

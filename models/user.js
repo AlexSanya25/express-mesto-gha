@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const validator = require('validator');
 
+// eslint-disable-next-line import/extensions
+const { regexUrl, regexEmail } = require('../utils/regex.js');
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,10 +24,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
       validate: {
-        validator(v) {
-          // eslint-disable-next-line no-useless-escape
-          return /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.test(v);
-        },
+        validator: (url) => regexUrl.test(url),
         message: 'Введен некорректный адрес ссылки',
       },
     },
@@ -33,20 +33,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       validate: {
-        validator(v) {
-          // eslint-disable-next-line no-useless-escape
-          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
-        },
+        validator: (email) => regexEmail.test(email),
         message: 'Введен некорректный адрес',
       },
     },
     password: {
       type: String,
       required: true,
-      validate: {
-        validator: ({ length }) => length >= 8,
-        message: 'Пароль должен содержать не менее 8 символов',
-      },
       select: false,
     },
   },

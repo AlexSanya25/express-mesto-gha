@@ -1,10 +1,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { Joi } = require('celebrate');
 
+// eslint-disable-next-line import/extensions
+const { regexUrl } = require('../utils/regex.js');
+
 const createCardJoi = {
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required(),
+    link: Joi.string().pattern(regexUrl).required(),
   }),
 };
 
@@ -18,7 +21,7 @@ const signUpJoi = {
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().pattern(regexUrl),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
@@ -33,6 +36,7 @@ const signInJoi = {
 
 const upUserJoi = {
   body: Joi.object().keys({
+    _id: Joi.string().length(24).hex().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),
@@ -40,7 +44,14 @@ const upUserJoi = {
 
 const upAvatarJoi = {
   body: Joi.object().keys({
-    avatar: Joi.string(),
+    _id: Joi.string().length(24).hex().required(),
+    avatar: Joi.string().pattern(regexUrl),
+  }),
+};
+
+const userIdJoi = {
+  body: Joi.object().keys({
+    _id: Joi.string().length(24).hex().required(),
   }),
 };
 
@@ -51,4 +62,5 @@ module.exports = {
   signInJoi,
   upUserJoi,
   upAvatarJoi,
+  userIdJoi,
 };
