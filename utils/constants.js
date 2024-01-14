@@ -7,6 +7,7 @@ const HttpCodesCards = {
   dublicate: 11000,
   conflict: 409,
   mismatchErr: 401,
+  notDeleteErr: 403,
 };
 
 module.exports = HttpCodesCards;

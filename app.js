@@ -32,7 +32,7 @@ app.use(router);
 app.use(errors());
 
 app.use('*', (err) => {
-  throw new NotFoundError({ message: err.message });
+  throw new NotFoundError('Такой страницы не существует');
 });
 
 // eslint-disable-next-line no-undef

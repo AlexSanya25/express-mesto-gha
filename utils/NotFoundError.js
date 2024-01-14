@@ -1,8 +1,11 @@
+// eslint-disable-next-line import/extensions
+const HttpCodesCards = require('./constants.js');
+
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.message = 'Такой страницы не существует';
-    this.statusCode = 404;
+    this.name = 'NotFoundError';
+    this.statusCode = HttpCodesCards.notFoundErr;
   }
 }
 

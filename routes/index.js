@@ -8,9 +8,10 @@ const adminsRouter = require('./admins');
 const auth = require('../middlewares/auth');
 
 const router = Router();
+router.use('/', adminsRouter);
 router.use('/', auth, userRouter);
 router.use('/', auth, cardRouter);
-router.use('/', adminsRouter);
+
 /*
 router.use('/users', auth, userRouter);
 */

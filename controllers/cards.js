@@ -2,9 +2,11 @@
 const Card = require('../models/card.js');
 
 // eslint-disable-next-line import/extensions
-const MestoProjectError = require('../utils/MestoProjectError.js');
+const NotDelete = require('../utils/NotDelete.js');
 // eslint-disable-next-line import/no-unresolved, import/extensions
 const NotValidIdError = require('../utils/NotValidIdError.js');
+// eslint-disable-next-line import/extensions
+const NotFoundError = require('../utils/NotFoundError.js');
 
 // eslint-disable-next-line import/extensions
 const HttpCodesCards = require('../utils/constants.js');
@@ -22,20 +24,24 @@ async function getCards(req, res, next) {
 const deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId).populate('owner').orFail(
-      () => new MestoProjectError('Карточка по заданному ID не найдена'),
+    const card = await Card.findByIdAndDelete(cardId).populate('owner').orFail(
+      () => new NotFoundError('Карточка по заданному ID не найдена'),
     );
     if (card.owner._id.toString() !== req.user._id.toString()) {
-      throw new MestoProjectError('У вас нет прав на удаление данной карточки');
+      throw new NotDelete('У вас нет прав на удаление данной карточки');
     }
     return res.status(HttpCodesCards.success).send(card);
   } catch (error) {
-    if (error.name === 'MestoProjectError') {
+    if (error.name === 'NotFoundError') {
       // eslint-disable-next-line no-undef
-      next(new MestoProjectError('Карточка по заданному ID не найдена'));
+      next(new NotFoundError('Карточка по заданному ID не найдена'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     if (error.name === 'CastError') {
       next(new NotValidIdError('Передан не валидный ID'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     next(error);
   }
@@ -51,6 +57,8 @@ const createCard = async (req, res, next) => {
   } catch (error) {
     if (error.name === 'ValidationError') {
       next(new NotValidIdError('Переданы не валидные данные'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     next(error);
   }
@@ -64,16 +72,20 @@ const likeCard = async (req, res, next) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     ).orFail(
-      () => new MestoProjectError('Карточка по заданному ID не найдена'),
+      () => new NotFoundError('Карточка по заданному ID не найдена'),
     );
     return res.status(HttpCodesCards.create).send(like);
   } catch (error) {
-    if (error.name === 'MestoProjectError') {
+    if (error.name === 'NotFoundError') {
       // eslint-disable-next-line no-undef
-      next(new MestoProjectError('Карточка по заданному ID не найдена'));
+      next(new NotFoundError('Карточка по заданному ID не найдена'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     if (error.name === 'CastError') {
       next(new NotValidIdError('Передан не валидный ID'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     next(error);
   }
@@ -87,16 +99,20 @@ const disLikeCard = async (req, res, next) => {
       { $pull: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     ).orFail(
-      () => new MestoProjectError('Карточка по заданному ID не найдена'),
+      () => new NotFoundError('Карточка по заданному ID не найдена'),
     );
     return res.status(HttpCodesCards.create).send(like);
   } catch (error) {
-    if (error.name === 'MestoProjectError') {
+    if (error.name === 'NotFoundError') {
       // eslint-disable-next-line no-undef
-      next(new MestoProjectError('Карточка по заданному ID не найдена'));
+      next(new NotFoundError('Карточка по заданному ID не найдена'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     if (error.name === 'CastError') {
       next(new NotValidIdError('Передан не валидный ID'));
+      // eslint-disable-next-line consistent-return
+      return;
     }
     next(error);
   }
