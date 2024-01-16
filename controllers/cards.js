@@ -24,13 +24,21 @@ async function getCards(req, res, next) {
 const deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findByIdAndDelete(cardId).populate('owner').orFail(
+    await Card.findById(cardId).orFail(
       () => new NotFoundError('Карточка по заданному ID не найдена'),
-    );
-    if (card.owner._id.toString() !== req.user._id.toString()) {
-      throw new NotDelete('У вас нет прав на удаление данной карточки');
-    }
-    return res.status(HttpCodesCards.success).send(card);
+    )
+    // eslint-disable-next-line no-shadow, consistent-return
+      .then((card) => {
+        if (card.owner._id.toString() === req.user._id.toString()) {
+          // eslint-disable-next-line max-len, no-shadow
+          return Card.findByIdAndDelete(cardId)
+            // eslint-disable-next-line no-shadow
+            .then((card) => res.status(HttpCodesCards.success).send(card));
+        // eslint-disable-next-line no-else-return
+        } else {
+          return next(new NotDelete('У вас нет прав на удаление данной карточки'));
+        }
+      });
   } catch (error) {
     if (error.name === 'NotFoundError') {
       // eslint-disable-next-line no-undef

@@ -138,7 +138,12 @@ const login = async (req, res, next) => {
     }
 
     const token = generateToken({ _id: userAdmin._id });
-    return res.status(HttpCodesCards.success).send({ userAdmin, token });
+    return res.status(HttpCodesCards.success).send(
+      {
+        // eslint-disable-next-line max-len
+        name: userAdmin.name, about: userAdmin.about, avatar: userAdmin.avatar, email: userAdmin.email, id: userAdmin._id, token,
+      },
+    );
   } catch (error) {
     if (error.message === 'NotAuthantificate') {
       next(new NotAuthorizate('Неверно введены данные'));
