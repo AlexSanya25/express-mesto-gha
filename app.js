@@ -11,6 +11,10 @@ const NotFoundError = require('./utils/NotFoundError.js');
 // eslint-disable-next-line import/extensions
 const error = require('./utils/error.js');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+// eslint-disable-next-line import/extensions
+const cors = require('./middlewares/cors.js');
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -18,20 +22,24 @@ const app = express();
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(json());
-/*
-app.use((req, res, next) => {
-  req.user = {
-    // eslint-disable-next-line max-len
-    _id: '657ec3ef46c8d88d9103fa5d',
-  };
-  next();
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
 });
-*/
+
+app.use(requestLogger);
+
+app.use(cors);
+
 app.use(router);
+
+app.use(errorLogger);
 
 app.use(errors());
 
-app.use('*', (err) => {
+app.use('*', () => {
   throw new NotFoundError('Такой страницы не существует');
 });
 

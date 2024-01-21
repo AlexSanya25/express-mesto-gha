@@ -11,6 +11,7 @@ const {
 const { signUpJoi, signInJoi } = require('../joi/joi.js');
 
 const adminsRouter = Router();
+
 adminsRouter.post('/signin', celebrate(signInJoi), login);
 adminsRouter.post('/signup', celebrate(signUpJoi), createUser);
 
